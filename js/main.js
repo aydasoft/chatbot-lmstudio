@@ -77,12 +77,15 @@ function setupEventListeners() {
             const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight < tolerance;
 
             if (!atBottom && userNearBottom) {
+                
+                console.log("Usuário rolou para cima. Desativando auto-scroll.");
                 userNearBottom = false;
                 config.setAutoScroll(false);
                 backToBottomBtn.style.display = 'block';
                 requestAnimationFrame(() => (backToBottomBtn.style.opacity = '1'));
             } 
             else if (atBottom && !userNearBottom) {
+                console.log("Usuário voltou ao fundo. Ativando auto-scroll.");
                 userNearBottom = true;
                 config.setAutoScroll(true);
                 backToBottomBtn.style.opacity = '0';

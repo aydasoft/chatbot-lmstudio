@@ -98,10 +98,10 @@ export function renderMessages(messages) {
         hljs.highlightElement(block);
     });
 
-    if (config.autoScroll) {
+    // Auto-scroll para a última mensagem
+    if (config.setAutoScroll()) {
         config.chatContainer.scrollTop = config.chatContainer.scrollHeight;
     }
-
 }
 
 // Formatar mensagem com suporte multimodal

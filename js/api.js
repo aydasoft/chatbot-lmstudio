@@ -57,11 +57,6 @@ export async function loadModels() {
         showToast('Erro ao carregar modelos', 'error');
     }
 }
-
-// Função auxiliar
-function isUserNearBottom(container, tolerance = 60) {
-    return container.scrollHeight - container.scrollTop - container.clientHeight < tolerance;
-  }
   
 // Enviar mensagem
 export async function sendMessage() {
@@ -154,12 +149,9 @@ export async function sendMessage() {
                     if (lastMsgEl) {
                         lastMsgEl.innerHTML = formatMessage(fullText);
                         
-                        // Só faz scroll automático se o usuário estiver no final
-                        if (config.autoScroll && isUserNearBottom(config.chatContainer)) {
-                            config.chatContainer.scrollTo({
-                                top: config.chatContainer.scrollHeight,
-                                behavior: 'smooth'
-                            });
+                        // Auto-scroll para a última mensagem
+                        if (config.setAutoScroll()) {
+                            config.chatContainer.scrollTop = config.chatContainer.scrollHeight;
                         }
 
                         await new Promise(requestAnimationFrame);
