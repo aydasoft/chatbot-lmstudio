@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAChat</title>
+
+    <!-- Estilos -->
+    <link href="styles.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" rel="stylesheet">
+
+    <!-- Bibliotecas -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast" id="toast">
+        <span id="toastIcon"></span>
+        <span id="toastMessage"></span>
+    </div>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">
+                <i><img src="img/ada.png" width="48" height="48"/></i>
+                ADAChat
+            </div>
+            <button class="close-sidebar" id="closeSidebar">✕</button>
+        </div>
+        
+        <div class="models-section">
+            <div class="section-title">
+                <i>🧠</i> Modelos Disponíveis
+            </div>
+            <div class="models-list" id="modelsContainer">
+                <div class="text-center text-white-50">Carregando modelos...</div>
+            </div>
+        </div>
+        
+        <div class="conversations-section">
+            <div class="section-title">
+                <i>💬</i> Conversas
+            </div>
+            <div class="conversations" id="conversationsContainer">
+                <div class="text-center text-white-50">Nenhuma conversa salva</div>
+            </div>
+            <button class="new-chat-btn" id="newChatBtn">
+                <i>+</i> Nova Conversa
+            </button>
+
+            <div class="btn-container">
+                <button class="import-btn" id="exportBtn">
+                    <i>📤</i> Exportar conversa
+                </button>
+                <button class="import-btn" id="importBtn">
+                    <i>📥</i> Importar conversa
+                </button>
+                <input type="file" id="importFile" accept=".json">
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <div class="section-title">
+                <i>⚙️</i> Configurações
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">Temperatura</label>
+                <input type="range" class="setting-input" id="temperature" min="0" max="1" step="0.1" value="0.7">
+                <span class="text-white-50" id="tempValue">0.7</span>
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">Máx. Tokens</label>
+                <input type="number" class="setting-input" id="maxTokens" min="1" max="4096" value="2048">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="chat-header">
+            <button class="hamburger-btn" id="hamburgerBtn">☰</button>
+            
+            <div class="header-info">
+                <div class="current-model" id="currentModel">
+                    <span class="model-status" id="modelStatus"></span>
+                    Selecione um modelo
+                </div>
+                <div class="current-conversation" id="currentConversation">Nenhuma conversa ativa</div>
+            </div>
+
+            <!-- Novo seletor de idioma -->
+            <div class="language-selector">
+                <select id="languageSelect" class="form-select form-select-sm">
+                    <option value="pt-BR" selected>Português 🇧🇷</option>
+                    <option value="en-US">English 🇺🇸</option>
+                </select>
+            </div>
+
+            <div class="header-actions">
+                <button class="action-btn" id="settingsBtn" title="Configurações">
+                    <i>⚙️</i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="empty-state" id="emptyState">
+                <i>💬</i>
+                <h4>Bem-vindo ao ADAChat!</h4>
+                <p>Selecione um modelo e comece uma conversa para explorar as capacidades avançadas da IA.</p>
+                <div class="status-indicator mt-3">
+                    <span class="status-dot" id="connectionStatus"></span>
+                    <span id="connectionText">Conectando ao ADAChat...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <!-- Campo de mensagem -->
+            <textarea 
+                class="message-input" 
+                id="messageInput" 
+                placeholder="Digite sua mensagem..." 
+                rows="1"
+                disabled
+            ></textarea>
+
+            <div class="preview-container" id="previewContainer"></div>
+            <!-- Botão de imagem -->
+            <label for="imageInput" class="uploadlabel">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true">
+                <path d="M12 3v7"></path>
+                <path d="M8 7l4-4 4 4"></path>
+                <rect x="2" y="9" width="20" height="13" rx="2"></rect>
+                <polyline points="4 20 9 13 13 17 17 12 20 16"></polyline>
+                <circle cx="7" cy="12" r="1.5"></circle>
+            </svg>
+            </label>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+
+            <!-- Botão de enviar -->
+            <button class="send-button" id="sendButton" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+    <script src="js/lang.js"></script>
+
+</body>
+</html>
